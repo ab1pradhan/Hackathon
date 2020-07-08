@@ -1,0 +1,284 @@
+<html>
+<head>
+   <title>Team 5 Map</title>
+   <meta http-equiv="refresh" content="20">  
+   <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+   <h3>ALL USERS INSIDE THE CAMPUS</h3>
+   <style>
+      html, body { border: 50; margin: 30; padding: 20; background-color: #DDDDDA; }
+      h3 {text-align: center;}
+      #map { height: 80vh; text-align: center; width: 80vw;border:3px solid black }
+      .center{
+      	position: relative;
+      	text-align: left;
+      	border:3px solid black;
+         background-color: white;
+      	overflow: scroll;
+      	height: 100px;
+      	/*width: 300px;*/
+      	font-size: 16px;
+        max-width: 80vw;
+      }
+      .clf:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+      .one{
+      	clear:both;
+      	height: 200px;
+      }
+      
+   </style>
+</head>
+<body>
+   <div class = "center clf">
+   	{% for your_list_element in alert %}
+      <p>{{ your_list_element }} </p>
+    {% endfor %}
+   </div>
+   <div id = "one">
+      <br>
+      <br>
+   </div>
+   <div id="map"></div>
+   <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+   <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+   <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+   <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+   <script src="https://stuk.github.io/jszip/dist/jszip.js" type="text/javascript" charset="utf-8"></script>
+
+   
+
+   <script>
+
+      const platform = new H.service.Platform({ apikey: 'IF0tXyGaqNfQB9aR2PBDQrOVwZ3p3VT0BxZe_IuxqAU' });
+      const defaultLayers = platform.createDefaultLayers();
+      const map = new H.Map(document.getElementById('map'),
+      defaultLayers.vector.normal.map, {
+
+      center: {  lat: {{latitude}}[1], lng: {{longitude}}[1] },
+      zoom: 15,
+      pixelRatio: window.devicePixelRatio || 1
+      });
+      /*
+      const linestring2 = new H.geo.LineString();
+      linestring2.pushLatLngAlt(17 , 78,0,17.33 , 78.3,0,17.33 , 78.3,0,17.33 , 78,0,17 , 78,0);
+      linestring2.pushLatLngAlt(17.33 , 78.3,0);
+      linestring2.pushLatLngAlt(17.33 , 78,0);
+      linestring2.pushLatLngAlt(17 , 78,0);
+      const polygon2 = new H.map.polygon(linestring2, {
+      style: { strokeColor: 'blue', lineWidth: 3 }
+      });
+      map.addObject(polygon2);
+      */
+
+      window.addEventListener('resize', () => map.getViewPort().resize());
+      const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+      const ui = H.ui.UI.createDefault(map, defaultLayers);
+      //
+
+      //Begin routing
+      //Configure transportation mode, start, end points 
+      
+      const request = {
+      mode: 'fastest;car',
+      waypoint0: 'geo!17.5801,78.12108',
+      waypoint1: 'geo!17.596416,78.123302',
+      representation: 'display'
+      };
+      //Initialize routing service
+      const router = platform.getRoutingService();
+      router.calculateRoute(request, response => {
+      //Parse the route's shape
+      const shape = response.response.route[0].shape.map(x => x.split(','));
+      const linestring = new H.geo.LineString();
+      shape.forEach(s => linestring.pushLatLngAlt(s[0], s[1]));
+      //Create a polyline with the shape
+      const routeLine = new H.map.Polyline(linestring, {
+         style: { strokeColor: 'blue', lineWidth: 3 }
+      });
+      /*
+      //Add route to map
+      map.addObject(routeLine);
+      //Zoom to bounds of the route shape
+      */
+
+      function addPolygonToMap(map) {
+      var lineString = new H.geo.LineString(
+      [17.596896,78.127400,0,   17.596896,78.125364,0,    17.598011,78.125201,0,    17.598093,78.127400,0,        17.596896,78.127400,0],
+      'values lat lng alt'
+      );
+      var lineString2 = new H.geo.LineString(
+      [17.596470,78.125499,0,    17.596486,78.126276,0,   17.595534,78.126341,0,   17.595637,78.125397,0,        17.596470,78.125499,0],
+      'values lat lng alt'
+      );
+
+      var lineString3 = new H.geo.LineString(
+      [17.585779,78.117980,0,    17.585779,78.119922,0,    17.584225,78.119922,0,   17.584225,78.117980,0,      17.585779,78.117980,0],
+      'values lat lng alt'
+      );
+
+      var lineString4 = new H.geo.LineString(
+      [17.585207,78.120695,0,   17.585207,78.122036,0,   17.584153,78.122036,0,    17.584153,78.120695,0,        17.585207,78.120695,0],
+      'values lat lng alt'
+      );
+
+
+      map.addObject(
+      new H.map.Polygon(lineString, {
+      style: {
+      //fillColor: '#FFFFCC',
+      strokeColor: '#829',
+      lineWidth: 6
+      }
+      })
+      );
+
+      map.addObject(
+      new H.map.Polygon(lineString2, {
+      style: {
+      //fillColor: '#FFFFCC',
+      strokeColor: '#829',
+      lineWidth: 3
+      }
+      })
+      );
+
+
+      map.addObject(
+      new H.map.Polygon(lineString3, {
+      style: {
+      //fillColor: '#FFFFCC',
+      strokeColor: '#829',
+      lineWidth: 4
+      }
+      })
+
+
+      );
+
+      map.addObject(
+      new H.map.Polygon(lineString4, {
+      style: {
+      //fillColor: '#AAFFCC',
+      strokeColor: '#429',
+      lineWidth: 5
+      }
+      })
+      );
+
+      }
+      addPolygonToMap(map);     
+
+      
+
+
+      function addDraggableMarker(map, behavior){
+      var marker = new H.map.Marker({lat: {{latitude}}[i], lng:{{longitude}}[i] }, {
+      // mark the object as volatile for the smooth dragging
+      volatility: true
+      });
+
+      marker.setData({{name|tojson|safe}}[i] + ' ' + {{cell_no|tojson|safe}}[i] + ' '+ {{roll|tojson|safe}}[i]);
+      // Ensure that the marker can receive drag events
+      marker.draggable = false;
+      marker.addEventListener('tap', function (evt) {
+    // event target is the marker itself, group is a parent event target
+    // for all objects that it contains
+    var bubble =  new H.ui.InfoBubble(evt.target.getGeometry(), {
+      // read custom data
+      content: evt.target.getData()
+    });
+    // show info bubble
+    ui.addBubble(bubble);
+  }, false);
+
+      map.addObject(marker);
+
+      // disable the default draggability of the underlying map
+      // and calculate the offset between mouse and target's position
+      // when starting to drag a marker object:
+      map.addEventListener('dragstart', function(ev) {
+      var target = ev.target,
+      pointer = ev.currentPointer;
+      if (target instanceof H.map.Marker) {
+      var targetPosition = map.geoToScreen(target.getGeometry());
+      target['offset'] = new H.math.Point(pointer.viewportX - targetPosition.x, pointer.viewportY - targetPosition.y);
+      behavior.disable();
+      }
+      }, false);
+
+
+      // re-enable the default draggability of the underlying map
+      // when dragging has completed
+      map.addEventListener('dragend', function(ev) {
+      var target = ev.target;
+      if (target instanceof H.map.Marker) {
+      behavior.enable();
+      }
+      }, false);
+
+      // Listen to the drag event and move the position of the marker
+      // as necessary
+      map.addEventListener('drag', function(ev) {
+      var target = ev.target,
+      pointer = ev.currentPointer;
+      if (target instanceof H.map.Marker) {
+      target.setGeometry(map.screenToGeo(pointer.viewportX - target['offset'].x, pointer.viewportY - target['offset'].y));
+      }
+      }, false);
+      }
+
+    var i ;
+    for (i = 0; i < {{len}}; i++) {
+      addDraggableMarker(map , behavior) ;
+   }
+
+      map.getViewModel() /* .setLookAtData({ bounds: routeLine.getBoundingBox()  })  */;
+
+      });
+
+
+
+	
+
+
+   </script>
+   
+
+   <div id = "final">
+      <br>
+      <br>
+   </div>
+   <div>
+   	<p>Enter details to route to a user</p>
+   	<form id = "your_form" onsubmit="yourFunction()" target="_blank">
+   	    <input type="text" name="keywords">
+    	<input type="submit" value="TRACK">
+	</form>
+	<p> Click to get Non active users</p>
+	<form id = "non_active" action="http://127.0.0.1:5000/D"  target="_blank">
+    	<input type="submit" value="Get List">
+	</form>
+   	
+   </div>
+   
+<script>
+function yourFunction(){
+    var action_src = "http://127.0.0.1:5000/" + document.getElementsByName("keywords")[0].value;
+    var your_form = document.getElementById('your_form');
+    your_form.action = action_src ;
+}
+</script>
+</body>
+</html>
+
+
+
+
